@@ -1,12 +1,14 @@
 services:
   webprefs:
-    image: webprefs
+    image: tacticallaptopbag/webprefs
     environment:
       - JWT_SECRET=debug-key
       - JWT_EXPIRY_SECONDS=900
       - JWT_REFRESH_EXPIRY_SECONDS=604800
+      # - APP_SERVE_PATH=/app/frontend
     volumes:
       - webprefs-data:/app/data
+      # - ./frontend:/app/frontend
     ports:
       - 8080:80
 
