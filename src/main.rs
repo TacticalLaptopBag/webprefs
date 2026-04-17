@@ -38,7 +38,11 @@ async fn main() -> std::io::Result<()> {
                 .route("/logout", web::post().to(api::auth::logout_post))
                 .route("/user/{id}", web::get().to(api::user::user_get))
                 .route("/user", web::post().to(api::user::user_post))
-                .route("/user", web::delete().to(api::user::user_delete)),
+                .route("/user", web::delete().to(api::user::user_delete))
+                .route("/prefs/{key}", web::get().to(api::prefs::prefs_get))
+                .route("/prefs/{key}", web::post().to(api::prefs::prefs_post_put))
+                .route("/prefs/{key}", web::put().to(api::prefs::prefs_post_put))
+                .route("/prefs/{key}", web::delete().to(api::prefs::prefs_delete)),
         )
     })
     .bind((host.as_str(), port))?

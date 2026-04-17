@@ -1,8 +1,9 @@
 use crate::config::Config;
 use crate::error::AppError;
 use crate::error::AppResult;
+use crate::models::db::prefs::PrefEntry;
 use crate::models::db::user::{BlacklistEntry, NewUser, User};
-use crate::schema::{token_blacklist, users};
+use crate::schema::{prefs, token_blacklist, users};
 use bcrypt::BcryptResult;
 use chrono::DateTime;
 use chrono::Utc;
@@ -145,6 +146,43 @@ impl AppState {
             .set(users::password_hash.eq(hash))
             .execute(&mut self.get_conn()?)
             .map_err(|e| AppError::DbQueryError(e))?;
+        Ok(())
+    }
+
+    pub fn get_pref(&self, user_id: &str, key: &str) -> AppResult<Option<PrefEntry>> {
+        Ok(prefs::table
+            .filter(prefs::user_id.eq(user_id))
+            .filter(prefs::pref_key.eq(key))
+            .load::<PrefEntry>(&mut self.get_conn()?)
+            .ok()
+            .and_then(|entries| entries.into_iter().next()))
+    }
+
+    pub fn set_pref(&self, entry: PrefEntry) -> AppResult<()> {
+        if self.get_pref(&entry.user_id, &entry.pref_key)?.is_none() {
+            diesel::insert_into(prefs::table)
+                .values(&entry)
+                .execute(&mut self.get_conn()?)
+                .map_err(|e| AppError::DbQueryError(e))?;
+        } else {
+            diesel::update(prefs::table)
+                .filter(prefs::user_id.eq(entry.user_id))
+                .filter(prefs::pref_key.eq(entry.pref_key))
+                .set(prefs::pref_value.eq(entry.pref_value))
+                .execute(&mut self.get_conn()?)
+                .map_err(|e| AppError::DbQueryError(e))?;
+        }
+        Ok(())
+    }
+
+    pub fn delete_pref(&self, user_id: &str, key: &str) -> AppResult<()> {
+        diesel::delete(
+            prefs::table
+                .filter(prefs::user_id.eq(user_id))
+                .filter(prefs::pref_key.eq(key)),
+        )
+        .execute(&mut self.get_conn()?)
+        .map_err(|e| AppError::DbQueryError(e))?;
         Ok(())
     }
 }

@@ -63,3 +63,13 @@ pub struct Claims {
     pub jti: String,
     pub kind: TokenKind,
 }
+
+#[derive(Deserialize)]
+pub struct PrefsQuery {
+    pub scope: Option<String>,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct PrefsForm {
+    pub value: Option<String>,
+}

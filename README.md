@@ -1,4 +1,4 @@
-# web-auth-template
+# webprefs
 
 ## Developer Setup
 
