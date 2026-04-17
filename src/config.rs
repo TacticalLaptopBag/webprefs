@@ -1,6 +1,6 @@
 use std::env;
 
-use crate::error::{AppResult, AppError};
+use crate::error::{AppError, AppResult};
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -16,6 +16,8 @@ pub struct Config {
     pub database_url: String,
     pub init_user_name: Option<String>,
     pub init_user_pass: Option<String>,
+
+    pub app_serve_path: Option<String>,
 }
 
 impl Config {
@@ -44,6 +46,7 @@ impl Config {
                 .map_err(|_| AppError::EnvVarUnset("DATABASE_URL"))?,
             init_user_name: env::var("INIT_USER_NAME").ok(),
             init_user_pass: env::var("INIT_USER_PASS").ok(),
+            app_serve_path: env::var("APP_SERVE_PATH").ok(),
         })
     }
 }
