@@ -1,0 +1,31 @@
+# web-auth-template
+
+## Developer Setup
+
+### Dependencies
+
+Requires sqlite3 to compile.
+Debian/Ubuntu:
+```bash
+sudo apt update && sudo apt install libsqlite3-dev
+```
+
+### Diesel
+
+Install `diesel_cli` using either [cargo-binstall] or `cargo install`:
+```bash
+cargo install cargo-binstall
+cargo binstall diesel_cli
+```
+```bash
+cargo install diesel_cli --no-default-features --features sqlite
+```
+
+Apply migrations:
+```bash
+diesel migration run
+```
+
+
+[cargo-binstall]: https://github.com/cargo-bins/cargo-binstall
+
