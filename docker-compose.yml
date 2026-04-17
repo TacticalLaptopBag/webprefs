@@ -1,0 +1,14 @@
+services:
+  webprefs:
+    image: webprefs
+    environment:
+      - JWT_SECRET=debug-key
+      - JWT_EXPIRY_SECONDS=900
+      - JWT_REFRESH_EXPIRY_SECONDS=604800
+    volumes:
+      - webprefs-data:/app/data
+    ports:
+      - 8080:80
+
+volumes:
+  webprefs-data:
