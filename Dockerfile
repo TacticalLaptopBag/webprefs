@@ -4,7 +4,7 @@ RUN apk add --no-cache musl-dev sqlite-dev sqlite-static
 WORKDIR /app
 COPY . .
 RUN cargo install diesel_cli --no-default-features --features sqlite
-RUN rm /app/webprefs.db
+RUN rm -f /app/default.db
 ENV DATABASE_URL=/app/default.db
 RUN diesel migration run
 RUN cargo build --release
