@@ -1,5 +1,5 @@
 use diesel::{prelude::*, sqlite::Sqlite};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::schema;
 
