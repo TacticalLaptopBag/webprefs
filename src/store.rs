@@ -153,6 +153,7 @@ impl AppState {
         Ok(prefs::table
             .filter(prefs::user_id.eq(user_id))
             .select(prefs::pref_scope)
+            .distinct()
             .load::<String>(&mut self.get_conn()?)
             .map_err(|e| AppError::DbQueryError(e))?)
     }
