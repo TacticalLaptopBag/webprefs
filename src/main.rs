@@ -37,10 +37,15 @@ async fn main() -> std::io::Result<()> {
     let state = web::Data::new(AppState::new(cfg)?);
 
     log::info!("Starting API on {host}:{port}");
-    if let Some(app_serve_path) = state.config.app_serve_path.clone()
-        && fs::exists(&app_serve_path).unwrap_or(false)
-    {
-        log::info!("Hosting files stored at {}", app_serve_path);
+    if let Some(app_serve_path) = state.config.app_serve_path.clone() {
+        if fs::exists(&app_serve_path).unwrap_or(false) {
+            log::info!("Hosting files stored at {}", app_serve_path);
+        } else {
+            log::info!(
+                "Directory at {} does not exist. Files will not be hosted.",
+                app_serve_path
+            )
+        }
     }
 
     HttpServer::new(move || {
