@@ -1,41 +1,61 @@
 use actix_web::{HttpResponse, web};
-use serde_json::json;
 
 use crate::{
     error::AppResult,
-    models::{Claims, PrefsForm, PrefsQuery, db::prefs::PrefEntry},
+    models::{
+        Claims,
+        db::prefs::PrefEntry,
+        prefs::{
+            PrefValueResponseData, PrefsForm, PrefsPath, PrefsResponseData, ScopesResponseData,
+        },
+    },
     store::AppState,
 };
 
-fn get_full_key(key: &str, scope_query: Option<String>) -> String {
-    let scope = scope_query.unwrap_or("default".into());
-    format!("{}.{}", scope, key)
-}
-
 async fn get_pref_entry(
     claims: &Claims,
-    key: &str,
-    scope_query: Option<String>,
+    scope: String,
+    key: String,
     state: web::Data<AppState>,
 ) -> AppResult<Option<PrefEntry>> {
-    let full_key = get_full_key(key, scope_query);
     let state_into = state.clone();
     let user_id_into = claims.sub.clone();
-    let entry = web::block(move || state_into.get_pref(&user_id_into, &full_key)).await??;
+    let entry = web::block(move || state_into.get_pref(&user_id_into, &scope, &key)).await??;
     Ok(entry)
+}
+
+// ----------------------------------------------------------------------------
+// ------------------------------- Endpoints ----------------------------------
+// ----------------------------------------------------------------------------
+pub async fn scopes_get(claims: Claims, state: web::Data<AppState>) -> AppResult<HttpResponse> {
+    let scopes = state.get_pref_scopes(&claims.sub)?;
+    Ok(HttpResponse::Ok().json(ScopesResponseData { scopes }))
+}
+
+pub async fn keys_get(
+    claims: Claims,
+    scope: web::Path<String>,
+    state: web::Data<AppState>,
+) -> AppResult<HttpResponse> {
+    let prefs = state.get_prefs_in_scope(&claims.sub, &scope)?;
+    Ok(HttpResponse::Ok().json(PrefsResponseData { prefs }))
+}
+
+pub async fn prefs_all_get(claims: Claims, state: web::Data<AppState>) -> AppResult<HttpResponse> {
+    let prefs = state.get_prefs(&claims.sub)?;
+    Ok(HttpResponse::Ok().json(PrefsResponseData { prefs }))
 }
 
 pub async fn prefs_get(
     claims: Claims,
-    key: web::Path<String>,
-    query: web::Query<PrefsQuery>,
+    path: web::Path<PrefsPath>,
     state: web::Data<AppState>,
 ) -> AppResult<HttpResponse> {
-    let pref_entry = get_pref_entry(&claims, &key, query.scope.clone(), state).await?;
+    let pref_entry = get_pref_entry(&claims, path.scope.clone(), path.key.clone(), state).await?;
     if let Some(entry) = pref_entry {
-        return Ok(HttpResponse::Ok().json(json!({
-            "value": entry.pref_value,
-        })));
+        return Ok(HttpResponse::Ok().json(PrefValueResponseData {
+            value: entry.pref_value,
+        }));
     }
 
     Ok(HttpResponse::NotFound().finish())
@@ -43,16 +63,15 @@ pub async fn prefs_get(
 
 pub async fn prefs_post_put(
     claims: Claims,
-    key: web::Path<String>,
-    query: web::Query<PrefsQuery>,
+    path: web::Path<PrefsPath>,
     state: web::Data<AppState>,
     form: web::Form<PrefsForm>,
 ) -> AppResult<HttpResponse> {
-    let full_key = get_full_key(&key, query.scope.clone());
     web::block(move || {
         state.set_pref(PrefEntry {
             user_id: claims.sub,
-            pref_key: full_key,
+            pref_key: path.key.clone(),
+            pref_scope: path.scope.clone(),
             pref_value: form.value.clone(),
         })
     })
@@ -63,17 +82,16 @@ pub async fn prefs_post_put(
 
 pub async fn prefs_delete(
     claims: Claims,
-    key: web::Path<String>,
-    query: web::Query<PrefsQuery>,
+    path: web::Path<PrefsPath>,
     state: web::Data<AppState>,
 ) -> AppResult<HttpResponse> {
-    let full_key = get_full_key(&key, query.scope.clone());
-    let pref_entry = get_pref_entry(&claims, &key, query.scope.clone(), state.clone()).await?;
+    let pref_entry =
+        get_pref_entry(&claims, path.scope.clone(), path.key.clone(), state.clone()).await?;
     if pref_entry.is_none() {
         return Ok(HttpResponse::NotFound().finish());
     }
 
-    web::block(move || state.delete_pref(&claims.sub, &full_key)).await??;
+    web::block(move || state.delete_pref(&claims.sub, &path.scope, &path.key)).await??;
 
     Ok(HttpResponse::Ok().finish())
 }

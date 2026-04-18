@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::models::db::user::User;
 
 pub mod db;
+pub mod prefs;
 
 // ── Request / response shapes ────────────────────────────────────────────────
 
@@ -62,14 +63,4 @@ pub struct Claims {
     /// Unique token id — used for blacklisting
     pub jti: String,
     pub kind: TokenKind,
-}
-
-#[derive(Deserialize)]
-pub struct PrefsQuery {
-    pub scope: Option<String>,
-}
-
-#[derive(Deserialize, Clone)]
-pub struct PrefsForm {
-    pub value: Option<String>,
 }

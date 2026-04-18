@@ -51,10 +51,22 @@ async fn main() -> std::io::Result<()> {
             .route("/user/{id}", web::get().to(api::user::user_get))
             .route("/user", web::post().to(api::user::user_post))
             .route("/user", web::delete().to(api::user::user_delete))
-            .route("/prefs/{key}", web::get().to(api::prefs::prefs_get))
-            .route("/prefs/{key}", web::post().to(api::prefs::prefs_post_put))
-            .route("/prefs/{key}", web::put().to(api::prefs::prefs_post_put))
-            .route("/prefs/{key}", web::delete().to(api::prefs::prefs_delete));
+            .route("/prefs", web::get().to(api::prefs::prefs_all_get))
+            .route("/prefs/scopes", web::get().to(api::prefs::scopes_get))
+            .route("/prefs/{scope}", web::get().to(api::prefs::keys_get))
+            .route("/prefs/{scope}/{key}", web::get().to(api::prefs::prefs_get))
+            .route(
+                "/prefs/{scope}/{key}",
+                web::post().to(api::prefs::prefs_post_put),
+            )
+            .route(
+                "/prefs/{scope}/{key}",
+                web::put().to(api::prefs::prefs_post_put),
+            )
+            .route(
+                "/prefs/{scope}/{key}",
+                web::delete().to(api::prefs::prefs_delete),
+            );
 
         if let Some(app_serve_path) = app_serve_path_into {
             App::new()

@@ -149,9 +149,33 @@ impl AppState {
         Ok(())
     }
 
-    pub fn get_pref(&self, user_id: &str, key: &str) -> AppResult<Option<PrefEntry>> {
+    pub fn get_pref_scopes(&self, user_id: &str) -> AppResult<Vec<String>> {
         Ok(prefs::table
             .filter(prefs::user_id.eq(user_id))
+            .select(prefs::pref_scope)
+            .load::<String>(&mut self.get_conn()?)
+            .map_err(|e| AppError::DbQueryError(e))?)
+    }
+
+    pub fn get_prefs_in_scope(&self, user_id: &str, scope: &str) -> AppResult<Vec<PrefEntry>> {
+        Ok(prefs::table
+            .filter(prefs::user_id.eq(user_id))
+            .filter(prefs::pref_scope.eq(scope))
+            .load::<PrefEntry>(&mut self.get_conn()?)
+            .map_err(|e| AppError::DbQueryError(e))?)
+    }
+
+    pub fn get_prefs(&self, user_id: &str) -> AppResult<Vec<PrefEntry>> {
+        Ok(prefs::table
+            .filter(prefs::user_id.eq(user_id))
+            .load::<PrefEntry>(&mut self.get_conn()?)
+            .map_err(|e| AppError::DbQueryError(e))?)
+    }
+
+    pub fn get_pref(&self, user_id: &str, scope: &str, key: &str) -> AppResult<Option<PrefEntry>> {
+        Ok(prefs::table
+            .filter(prefs::user_id.eq(user_id))
+            .filter(prefs::pref_scope.eq(scope))
             .filter(prefs::pref_key.eq(key))
             .load::<PrefEntry>(&mut self.get_conn()?)
             .ok()
@@ -159,7 +183,10 @@ impl AppState {
     }
 
     pub fn set_pref(&self, entry: PrefEntry) -> AppResult<()> {
-        if self.get_pref(&entry.user_id, &entry.pref_key)?.is_none() {
+        if self
+            .get_pref(&entry.user_id, &entry.pref_scope, &entry.pref_key)?
+            .is_none()
+        {
             diesel::insert_into(prefs::table)
                 .values(&entry)
                 .execute(&mut self.get_conn()?)
@@ -167,6 +194,7 @@ impl AppState {
         } else {
             diesel::update(prefs::table)
                 .filter(prefs::user_id.eq(entry.user_id))
+                .filter(prefs::pref_scope.eq(entry.pref_scope))
                 .filter(prefs::pref_key.eq(entry.pref_key))
                 .set(prefs::pref_value.eq(entry.pref_value))
                 .execute(&mut self.get_conn()?)
@@ -175,10 +203,11 @@ impl AppState {
         Ok(())
     }
 
-    pub fn delete_pref(&self, user_id: &str, key: &str) -> AppResult<()> {
+    pub fn delete_pref(&self, user_id: &str, scope: &str, key: &str) -> AppResult<()> {
         diesel::delete(
             prefs::table
                 .filter(prefs::user_id.eq(user_id))
+                .filter(prefs::pref_scope.eq(scope))
                 .filter(prefs::pref_key.eq(key)),
         )
         .execute(&mut self.get_conn()?)
