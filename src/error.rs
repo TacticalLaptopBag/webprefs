@@ -19,7 +19,7 @@ pub enum AppError {
     AuthInvalidToken,
     #[error("Login expired")]
     AuthExpiredToken,
-    #[error("You have been logged out")]
+    #[error("You are not logged in")]
     AuthBlacklistedToken,
     #[error("You are not logged in")]
     AuthMissingToken,
