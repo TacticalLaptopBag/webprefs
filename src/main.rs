@@ -5,8 +5,9 @@ mod models;
 mod schema;
 mod store;
 
+use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
-use actix_web::{App, HttpServer, middleware::Logger, web};
+use actix_web::{App, HttpServer, http, middleware::Logger, web};
 use store::AppState;
 
 async fn index(app_serve_path: web::Data<String>) -> actix_web::Result<NamedFile> {
@@ -39,6 +40,15 @@ async fn main() -> std::io::Result<()> {
     }
 
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allowed_origin("http://localhost:4200")
+            .allowed_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+            .allowed_headers(vec![
+                http::header::CONTENT_TYPE,
+                http::header::AUTHORIZATION,
+            ])
+            .supports_credentials()
+            .max_age(3600);
         let app_serve_path_into = app_serve_path_into.clone();
         let api = web::scope("/api/v1")
             .app_data(state.clone())
@@ -74,8 +84,9 @@ async fn main() -> std::io::Result<()> {
                 .app_data(app_serve_path.clone())
                 .service(Files::new("/", app_serve_path).index_file("index.html"))
                 .default_service(web::get().to(index))
+                .wrap(cors)
         } else {
-            App::new().service(api)
+            App::new().service(api).wrap(cors)
         }
     })
     .bind((host.as_str(), port))?
