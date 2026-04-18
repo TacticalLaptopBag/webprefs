@@ -1,0 +1,11 @@
+<div class="home">
+  <app-logout-button />
+  <br>
+
+  @if(scope != null) {
+  <app-prefs [scope]="scope" />
+  } @else {
+  <app-scopes />
+  }
+
+</div>

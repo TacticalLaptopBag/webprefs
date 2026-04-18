@@ -1,0 +1,7 @@
+<ul>
+  @for (scope of scopes$ | async; track $index) {
+  <li>
+    <a [routerLink]="`/scope/${scope}`">{{scope}}</a>
+  </li>
+  }
+</ul>
