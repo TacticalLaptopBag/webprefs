@@ -247,7 +247,8 @@ pub async fn blacklist_tokens(req: &HttpRequest, state: web::Data<AppState>) -> 
             let state_into = state.clone();
             let claims_into = claims.clone();
             web::block(move || state_into.blacklist_token(&claims_into.jti, claims_into.exp))
-                .await??;
+                .await?
+                .unwrap_or_else(|e| log::error!("Error while blacklisting token: {}", e));
         }
     }
 
@@ -257,7 +258,8 @@ pub async fn blacklist_tokens(req: &HttpRequest, state: web::Data<AppState>) -> 
             let state_into = state.clone();
             let claims_into = claims.clone();
             web::block(move || state_into.blacklist_token(&claims_into.jti, claims_into.exp))
-                .await??;
+                .await?
+                .unwrap_or_else(|e| log::error!("Error while blacklisting token: {}", e));
         }
     }
 
