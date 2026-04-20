@@ -30,7 +30,23 @@ export class AuthService {
             .set('password', password)
 
         return this._http.post(`${environment.baseUrl}/api/v1/login`, form).pipe(
-            tap(() => this._router.navigate(['/']))
+            tap(() => {
+                this._loggedIn$.next(true)
+                this._router.navigate(['/'])
+            })
+        )
+    }
+
+    signup(username: string, password: string): Observable<any> {
+        const form = new HttpParams()
+            .set('username', username)
+            .set('password', password)
+
+        return this._http.post(`${environment.baseUrl}/api/v1/user`, form).pipe(
+            tap(() => {
+                this._loggedIn$.next(true)
+                this._router.navigate(['/'])
+            })
         )
     }
 

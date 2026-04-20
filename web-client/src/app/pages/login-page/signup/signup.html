@@ -1,0 +1,24 @@
+<div class="login-box-content">
+  <form class="login-form" (ngSubmit)="onSubmit()">
+    @if (errorMsg != null) {
+    <div class="error">
+      {{errorMsg()}}
+    </div>
+    }
+    <div class="input-row">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" [(ngModel)]="username">
+    </div>
+    <div class="input-row">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" [(ngModel)]="password">
+    </div>
+    <div class="input-row">
+      <label for="confirm-password">Confirm Password:</label>
+      <input type="password" id="confirm-password" name="confirm-password" [(ngModel)]="passwordConfirm">
+    </div>
+    <div class="input-row action-row">
+      <input type="submit" value="Sign up" [disabled]="isLoading()">
+    </div>
+  </form>
+</div>
