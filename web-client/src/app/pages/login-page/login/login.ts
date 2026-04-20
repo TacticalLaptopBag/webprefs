@@ -21,7 +21,7 @@ export class Login {
         this.errorMsg.set(null)
         this._authSvc.login(this.username(), this.password()).subscribe({
             error: (err) => {
-                const errMsg = err?.error?.error ?? err?.error ?? err
+                const errMsg = err?.message ?? err?.error?.error ?? err?.error ?? err
                 this.errorMsg.set(errMsg?.toString())
                 this.isLoading.set(false)
             }
