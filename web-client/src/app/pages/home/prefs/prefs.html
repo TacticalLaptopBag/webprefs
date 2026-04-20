@@ -1,32 +1,34 @@
-<a routerLink="/">Back to scopes</a>
 <h1>Keys in {{scope}}</h1>
-<table>
-  <tr>
-    <th>Key</th>
-    <th>Value</th>
-    <th>Actions</th>
-  </tr>
-  @for (pref of prefs$() | async; track $index) {
-  <tr>
-    <td>{{pref.pref_key}}</td>
-    <td>
-      <input type="text" [(ngModel)]="pref.pref_value">
-    </td>
-    <td>
-      <button (click)="submitChange(pref)">Save</button>
-      <button (click)="deletePref(pref)">Delete</button>
-    </td>
-  </tr>
-  }
-  <tr>
-    <td>
-      <input type="text" placeholder="Key..." [(ngModel)]="newEntryKey">
-    </td>
-    <td>
-      <input type="text" placeholder="Value..." [(ngModel)]="newEntryValue">
-    </td>
-    <td>
-      <button (click)="createEntry()">Create Entry</button>
-    </td>
-  </tr>
-</table>
+<div class="container">
+  <a routerLink="/">Back to scopes</a>
+  <table>
+    <tr>
+      <th>Key</th>
+      <th>Value</th>
+      <th>Actions</th>
+    </tr>
+    @for (pref of prefs$() | async; track $index) {
+    <tr>
+      <td>{{pref.pref_key}}</td>
+      <td>
+        <input type="text" [(ngModel)]="pref.pref_value">
+      </td>
+      <td>
+        <button class="save-btn" (click)="submitChange(pref)">Save</button>
+        <button class="delete-btn" (click)="deletePref(pref)">Delete</button>
+      </td>
+    </tr>
+    }
+    <tr>
+      <td>
+        <input type="text" placeholder="Key..." [(ngModel)]="newEntryKey">
+      </td>
+      <td>
+        <input type="text" placeholder="Value..." [(ngModel)]="newEntryValue">
+      </td>
+      <td>
+        <button (click)="createEntry()">Create Entry</button>
+      </td>
+    </tr>
+  </table>
+</div>

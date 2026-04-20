@@ -6,11 +6,10 @@
   } @empty {
   <p>No scopes exist.</p>
   }
-
-  <div class="create-entry">
-    <input type="text" placeholder="Scope..." [(ngModel)]="newEntryScope">
-    <input type="text" placeholder="Key..." [(ngModel)]="newEntryKey">
-    <input type="text" placeholder="Value..." [(ngModel)]="newEntryValue">
-    <button (click)="createEntry()">Create Entry</button>
-  </div>
 </ul>
+<div class="create-entry">
+  <input type="text" placeholder="Scope..." [(ngModel)]="newEntryScope">
+  <input type="text" placeholder="Key..." [(ngModel)]="newEntryKey">
+  <input type="text" placeholder="Value..." [(ngModel)]="newEntryValue">
+  <button (click)="createEntry()">Create Entry</button>
+</div>

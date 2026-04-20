@@ -1,0 +1,16 @@
+ul {
+  background-color: lightgoldenrodyellow;
+  border-radius: 1rem;
+  padding: 1rem;
+  padding-left: 2rem;
+}
+
+li {
+  font-size: 1.1rem;
+}
+
+.create-entry {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.2rem;
+}
