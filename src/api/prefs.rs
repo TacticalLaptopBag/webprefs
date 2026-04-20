@@ -61,14 +61,33 @@ pub async fn prefs_get(
     Ok(HttpResponse::NotFound().finish())
 }
 
-pub async fn prefs_post_put(
+pub async fn prefs_post(
     claims: Claims,
     path: web::Path<PrefsPath>,
     state: web::Data<AppState>,
     form: web::Form<PrefsForm>,
 ) -> AppResult<HttpResponse> {
     web::block(move || {
-        state.set_pref(PrefEntry {
+        state.create_pref(PrefEntry {
+            user_id: claims.sub,
+            pref_key: path.key.clone(),
+            pref_scope: path.scope.clone(),
+            pref_value: form.value.clone(),
+        })
+    })
+    .await??;
+
+    Ok(HttpResponse::Ok().finish())
+}
+
+pub async fn prefs_put(
+    claims: Claims,
+    path: web::Path<PrefsPath>,
+    state: web::Data<AppState>,
+    form: web::Form<PrefsForm>,
+) -> AppResult<HttpResponse> {
+    web::block(move || {
+        state.update_pref(PrefEntry {
             user_id: claims.sub,
             pref_key: path.key.clone(),
             pref_scope: path.scope.clone(),

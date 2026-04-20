@@ -26,13 +26,20 @@ export class PrefsService {
             .pipe(map((data) => data.value))
     }
 
-    public setPref(scope: string, key: string, value: string | null): Observable<{}> {
+    public createPref(scope: string, key: string, value: string | null): Observable<{}> {
         let form = new HttpParams()
         if (value != null) {
-            console.log('set to', value)
             form = form.set('value', value)
         }
         return this._http.post(`${environment.baseUrl}/api/v1/prefs/${scope}/${key}`, form)
+    }
+
+    public updatePref(scope: string, key: string, value: string | null): Observable<{}> {
+        let form = new HttpParams()
+        if (value != null) {
+            form = form.set('value', value)
+        }
+        return this._http.put(`${environment.baseUrl}/api/v1/prefs/${scope}/${key}`, form)
     }
 
     public deletePref(scope: string, key: string): Observable<{}> {

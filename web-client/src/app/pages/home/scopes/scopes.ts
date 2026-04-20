@@ -30,7 +30,7 @@ export class Scopes implements OnInit {
     }
 
     public createEntry() {
-        this._prefsSvc.setPref(this.newEntryScope, this.newEntryKey, this.newEntryValue).subscribe(() => {
+        this._prefsSvc.createPref(this.newEntryScope, this.newEntryKey, this.newEntryValue).subscribe(() => {
             this.newEntryScope = ''
             this.newEntryKey = ''
             this.newEntryValue = ''

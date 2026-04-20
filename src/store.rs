@@ -183,24 +183,22 @@ impl AppState {
             .and_then(|entries| entries.into_iter().next()))
     }
 
-    pub fn set_pref(&self, entry: PrefEntry) -> AppResult<()> {
-        if self
-            .get_pref(&entry.user_id, &entry.pref_scope, &entry.pref_key)?
-            .is_none()
-        {
-            diesel::insert_into(prefs::table)
-                .values(&entry)
-                .execute(&mut self.get_conn()?)
-                .map_err(|e| AppError::DbQueryError(e))?;
-        } else {
-            diesel::update(prefs::table)
-                .filter(prefs::user_id.eq(entry.user_id))
-                .filter(prefs::pref_scope.eq(entry.pref_scope))
-                .filter(prefs::pref_key.eq(entry.pref_key))
-                .set(prefs::pref_value.eq(entry.pref_value))
-                .execute(&mut self.get_conn()?)
-                .map_err(|e| AppError::DbQueryError(e))?;
-        }
+    pub fn create_pref(&self, entry: PrefEntry) -> AppResult<()> {
+        diesel::insert_into(prefs::table)
+            .values(&entry)
+            .execute(&mut self.get_conn()?)
+            .map_err(|e| AppError::DbQueryError(e))?;
+        Ok(())
+    }
+
+    pub fn update_pref(&self, entry: PrefEntry) -> AppResult<()> {
+        diesel::update(prefs::table)
+            .filter(prefs::user_id.eq(entry.user_id))
+            .filter(prefs::pref_scope.eq(entry.pref_scope))
+            .filter(prefs::pref_key.eq(entry.pref_key))
+            .set(prefs::pref_value.eq(entry.pref_value))
+            .execute(&mut self.get_conn()?)
+            .map_err(|e| AppError::DbQueryError(e))?;
         Ok(())
     }
 

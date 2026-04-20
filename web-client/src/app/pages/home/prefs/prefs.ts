@@ -31,7 +31,7 @@ export class Prefs implements OnInit {
     }
 
     public submitChange(entry: PrefEntry) {
-        this._prefSvc.setPref(entry.pref_scope, entry.pref_key, entry.pref_value).subscribe(() => {
+        this._prefSvc.updatePref(entry.pref_scope, entry.pref_key, entry.pref_value).subscribe(() => {
             this.refresh()
         })
     }
@@ -43,7 +43,7 @@ export class Prefs implements OnInit {
     }
 
     public createEntry() {
-        this._prefSvc.setPref(this.scope, this.newEntryKey, this.newEntryValue).subscribe(() => {
+        this._prefSvc.createPref(this.scope, this.newEntryKey, this.newEntryValue).subscribe(() => {
             this.refresh()
             this.newEntryKey = ''
             this.newEntryValue = ''

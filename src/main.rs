@@ -100,12 +100,9 @@ async fn main() -> std::io::Result<()> {
             .route("/prefs/{scope}/{key}", web::get().to(api::prefs::prefs_get))
             .route(
                 "/prefs/{scope}/{key}",
-                web::post().to(api::prefs::prefs_post_put),
+                web::post().to(api::prefs::prefs_post),
             )
-            .route(
-                "/prefs/{scope}/{key}",
-                web::put().to(api::prefs::prefs_post_put),
-            )
+            .route("/prefs/{scope}/{key}", web::put().to(api::prefs::prefs_put))
             .route(
                 "/prefs/{scope}/{key}",
                 web::delete().to(api::prefs::prefs_delete),
