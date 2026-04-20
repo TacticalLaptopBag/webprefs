@@ -26,9 +26,22 @@ async fn main() -> std::io::Result<()> {
 
     let cfg = config::Config::from_env()?;
     if cfg.jwt_secret == "debug-key" {
-        log::warn!("===============================================================");
+        log::warn!(
+            "================================================================================"
+        );
         log::warn!("JWT_SECRET is not configured! DO NOT use this in a deployment!");
-        log::warn!("===============================================================");
+        log::warn!(
+            "================================================================================"
+        );
+    }
+    if cfg.cors_allowed_origins == "*" {
+        log::warn!(
+            "================================================================================"
+        );
+        log::warn!("CORS_ALLOWED_ORIGINS is not configured! DO NOT use this in a deployment!");
+        log::warn!(
+            "================================================================================"
+        );
     }
     let host = cfg.host.clone();
     let port = cfg.port;
@@ -48,8 +61,11 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
+    let allowed_origins = state.config.parse_cors_allowed_origins();
+    log::info!("Allowed origins: {:?}", allowed_origins);
+
     HttpServer::new(move || {
-        let cors = Cors::default()
+        let mut cors = Cors::default()
             .allowed_origin("http://localhost:4200")
             .allowed_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"])
             .allowed_headers(vec![
@@ -58,6 +74,14 @@ async fn main() -> std::io::Result<()> {
             ])
             .supports_credentials()
             .max_age(3600);
+        for allowed_origin in &allowed_origins {
+            if allowed_origin.contains("*") {
+                cors = cors.send_wildcard();
+            } else {
+                cors = cors.allowed_origin(allowed_origin);
+            }
+        }
+
         let app_serve_path_into = app_serve_path_into.clone();
         let api = web::scope("/api/v1")
             .app_data(state.clone())

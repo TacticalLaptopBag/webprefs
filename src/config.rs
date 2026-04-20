@@ -12,6 +12,7 @@ pub struct Config {
     pub use_secure_cookies: bool,
     pub host: String,
     pub port: u16,
+    pub cors_allowed_origins: String,
 
     pub database_url: String,
     pub init_user_name: Option<String>,
@@ -42,11 +43,19 @@ impl Config {
                 .unwrap_or("8080".into())
                 .parse()
                 .map_err(|_| AppError::EnvVarNotANumber("PORT"))?,
+            cors_allowed_origins: env::var("CORS_ALLOWED_ORIGINS").unwrap_or("*".into()),
             database_url: env::var("DATABASE_URL")
                 .map_err(|_| AppError::EnvVarUnset("DATABASE_URL"))?,
             init_user_name: env::var("INIT_USER_NAME").ok(),
             init_user_pass: env::var("INIT_USER_PASS").ok(),
             app_serve_path: env::var("APP_SERVE_PATH").ok(),
         })
+    }
+
+    pub fn parse_cors_allowed_origins(&self) -> Vec<String> {
+        self.cors_allowed_origins
+            .split(',')
+            .map(|s| s.to_string())
+            .collect()
     }
 }
