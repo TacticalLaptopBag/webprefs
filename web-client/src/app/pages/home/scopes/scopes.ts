@@ -12,13 +12,15 @@ import { Observable, of } from 'rxjs';
     styleUrl: './scopes.css',
 })
 export class Scopes implements OnInit {
-    private _prefsSvc = inject(PrefsService)
     public scopes$ = signal<Observable<string[]>>(of([]))
 
     public newEntryScope = ''
     public newEntryKey = ''
     public newEntryValue = ''
 
+    private _prefsSvc = inject(PrefsService)
+
+    // TODO: The entry creator should be a separate component
     ngOnInit(): void {
         this.refresh()
     }

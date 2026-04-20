@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 
+// TODO: This should be combined with the signup component somehow...
 @Component({
     selector: 'app-login',
     imports: [FormsModule],
