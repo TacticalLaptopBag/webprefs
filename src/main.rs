@@ -5,6 +5,8 @@ mod models;
 mod schema;
 mod store;
 
+use std::fs;
+
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
 use actix_web::{App, HttpServer, http, middleware::Logger, web};
@@ -35,7 +37,9 @@ async fn main() -> std::io::Result<()> {
     let state = web::Data::new(AppState::new(cfg)?);
 
     log::info!("Starting API on {host}:{port}");
-    if let Some(app_serve_path) = state.config.app_serve_path.clone() {
+    if let Some(app_serve_path) = state.config.app_serve_path.clone()
+        && fs::exists(&app_serve_path).unwrap_or(false)
+    {
         log::info!("Hosting files stored at {}", app_serve_path);
     }
 
@@ -78,7 +82,9 @@ async fn main() -> std::io::Result<()> {
                 web::delete().to(api::prefs::prefs_delete),
             );
 
-        if let Some(app_serve_path) = app_serve_path_into {
+        if let Some(app_serve_path) = app_serve_path_into
+            && fs::exists(&app_serve_path).unwrap_or(false)
+        {
             App::new()
                 .service(api)
                 .app_data(app_serve_path.clone())
