@@ -33,10 +33,14 @@ pub enum AppError {
     DbQueryError(#[from] diesel::result::Error),
     #[error("Object not found")]
     DbObjectNotFound,
+    #[error("Object already exists")]
+    DbObjectAlreadyExists,
+    #[error("Object does not exist")]
+    DbObjectDoesNotExist,
 
     // Misc.
-    #[error("Internal error: {0}")]
-    InternalError(String),
+    #[error("Internal server error")]
+    InternalError,
     #[error(transparent)]
     Blocking(#[from] actix_web::error::BlockingError),
 

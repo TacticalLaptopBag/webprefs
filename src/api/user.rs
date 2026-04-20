@@ -1,11 +1,11 @@
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpResponse, web};
 use serde_json::json;
 use uuid::Uuid;
 
 use crate::{
-    api::auth::{blacklist_tokens, clear_access_cookies, create_access_cookies},
+    api::auth::create_access_cookies,
     error::{AppError, AppResult},
-    models::{Claims, LoginForm, UserInfo, db::user::NewUser},
+    models::{LoginForm, UserInfo, db::user::NewUser},
     store::{AppState, hash_password},
 };
 
@@ -52,28 +52,4 @@ pub async fn user_post(
                 },
             }
         )))
-}
-
-pub async fn user_delete(
-    req: HttpRequest,
-    claims: Claims,
-    state: web::Data<AppState>,
-) -> AppResult<HttpResponse> {
-    let user_id = claims.sub;
-
-    let state_into = state.clone();
-    let user_id_into = user_id.clone();
-    let user = web::block(move || state_into.delete_user_with_id(&user_id_into))
-        .await??
-        .ok_or(AppError::DbObjectNotFound)?;
-
-    blacklist_tokens(&req, state.clone()).await?;
-    let cleared_cookies = clear_access_cookies(&state);
-
-    Ok(HttpResponse::Ok()
-        .cookie(cleared_cookies.access_cookie)
-        .cookie(cleared_cookies.refresh_cookie)
-        .json(json!({
-            "message": format!("Deleted user {}", user.username)
-        })))
 }

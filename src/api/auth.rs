@@ -14,6 +14,7 @@ use actix_web::{
 use chrono::Utc;
 use jsonwebtoken::errors::ErrorKind;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
+use serde_json::json;
 use std::future::Future;
 use std::pin::Pin;
 use uuid::Uuid;
@@ -51,7 +52,7 @@ fn make_token(
         &claims,
         &EncodingKey::from_secret(state.config.jwt_secret.as_bytes()),
     )
-    .map_err(|e| AppError::InternalError(e.to_string()))
+    .map_err(|_| AppError::InternalError)
 }
 
 fn verify_token(state: &AppState, token: &str) -> AppResult<Claims> {
@@ -154,8 +155,8 @@ pub async fn login_post(
     .await??;
 
     // Verify password
-    let valid = bcrypt::verify(&form.password, &user.password_hash)
-        .map_err(|e| AppError::InternalError(e.to_string()))?;
+    let valid =
+        bcrypt::verify(&form.password, &user.password_hash).map_err(|_| AppError::InternalError)?;
 
     if !valid {
         return Err(AppError::AuthInvalidCredentials);
@@ -285,7 +286,7 @@ impl FromRequest for Claims {
         Box::pin(async move {
             let state = req
                 .app_data::<web::Data<AppState>>()
-                .ok_or(AppError::InternalError("Missing state".into()))?;
+                .ok_or(AppError::InternalError)?;
 
             let token = cookie_value(&req, ACCESS_COOKIE).ok_or(AppError::AuthMissingToken)?;
 
@@ -317,7 +318,7 @@ pub async fn login_put(
     })
     .await??;
     let valid = bcrypt::verify(&form.old_password, &user.password_hash)
-        .map_err(|e| AppError::InternalError(e.to_string()))?;
+        .map_err(|_| AppError::InternalError)?;
 
     if !valid {
         return Err(AppError::AuthInvalidCredentials);
@@ -328,4 +329,28 @@ pub async fn login_put(
     Ok(HttpResponse::Ok().json(serde_json::json!({
         "message": "Password changed successfully"
     })))
+}
+
+pub async fn login_delete(
+    req: HttpRequest,
+    claims: Claims,
+    state: web::Data<AppState>,
+) -> AppResult<HttpResponse> {
+    let user_id = claims.sub;
+
+    let state_into = state.clone();
+    let user_id_into = user_id.clone();
+    let user = web::block(move || state_into.delete_user_with_id(&user_id_into))
+        .await??
+        .ok_or(AppError::DbObjectNotFound)?;
+
+    blacklist_tokens(&req, state.clone()).await?;
+    let cleared_cookies = clear_access_cookies(&state);
+
+    Ok(HttpResponse::Ok()
+        .cookie(cleared_cookies.access_cookie)
+        .cookie(cleared_cookies.refresh_cookie)
+        .json(json!({
+            "message": format!("Deleted user {}", user.username)
+        })))
 }

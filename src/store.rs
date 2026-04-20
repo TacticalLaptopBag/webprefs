@@ -155,7 +155,7 @@ impl AppState {
             .select(prefs::pref_scope)
             .distinct()
             .load::<String>(&mut self.get_conn()?)
-            .map_err(|e| AppError::DbQueryError(e))?)
+            .map_err(|_| AppError::InternalError)?)
     }
 
     pub fn get_prefs_in_scope(&self, user_id: &str, scope: &str) -> AppResult<Vec<PrefEntry>> {
@@ -163,14 +163,14 @@ impl AppState {
             .filter(prefs::user_id.eq(user_id))
             .filter(prefs::pref_scope.eq(scope))
             .load::<PrefEntry>(&mut self.get_conn()?)
-            .map_err(|e| AppError::DbQueryError(e))?)
+            .map_err(|_| AppError::DbObjectNotFound)?)
     }
 
     pub fn get_prefs(&self, user_id: &str) -> AppResult<Vec<PrefEntry>> {
         Ok(prefs::table
             .filter(prefs::user_id.eq(user_id))
             .load::<PrefEntry>(&mut self.get_conn()?)
-            .map_err(|e| AppError::DbQueryError(e))?)
+            .map_err(|_| AppError::DbObjectNotFound)?)
     }
 
     pub fn get_pref(&self, user_id: &str, scope: &str, key: &str) -> AppResult<Option<PrefEntry>> {
@@ -187,7 +187,7 @@ impl AppState {
         diesel::insert_into(prefs::table)
             .values(&entry)
             .execute(&mut self.get_conn()?)
-            .map_err(|e| AppError::DbQueryError(e))?;
+            .map_err(|_| AppError::DbObjectAlreadyExists)?;
         Ok(())
     }
 
@@ -198,7 +198,7 @@ impl AppState {
             .filter(prefs::pref_key.eq(entry.pref_key))
             .set(prefs::pref_value.eq(entry.pref_value))
             .execute(&mut self.get_conn()?)
-            .map_err(|e| AppError::DbQueryError(e))?;
+            .map_err(|_| AppError::DbObjectDoesNotExist)?;
         Ok(())
     }
 
@@ -210,7 +210,7 @@ impl AppState {
                 .filter(prefs::pref_key.eq(key)),
         )
         .execute(&mut self.get_conn()?)
-        .map_err(|e| AppError::DbQueryError(e))?;
+        .map_err(|_| AppError::DbObjectDoesNotExist)?;
         Ok(())
     }
 }
