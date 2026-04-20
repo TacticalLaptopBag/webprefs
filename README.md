@@ -3,6 +3,8 @@
 This is a lightweight key-value store, intended to be used with simple applications that wish to store data online.
 
 - [webprefs](#webprefs)
+  - [Docker](#docker)
+    - [Docker Compose](#docker-compose)
   - [API](#api)
     - [`/login`](#login)
       - [POST](#post)
@@ -32,6 +34,32 @@ This is a lightweight key-value store, intended to be used with simple applicati
     - [Dependencies](#dependencies)
       - [Debian/Ubuntu](#debianubuntu)
     - [Diesel](#diesel)
+
+## Docker
+
+A Docker image is available on Docker Hub as [tacticallaptopbag/webprefs][docker-hub].
+
+* Ensure you set `JWT_SECRET` or else your installation will be very insecure.
+* It's also recommended to set `CORS_ALLOWED_ORIGINS` to be a comma-separated list of valid origins.
+* Create a Docker volume named `webprefs-data` to store webprefs data. Otherwise, all user data will be lost every time the Docker container is restarted.
+* If you want to host a web app using the backend, you should bind mount your web files to `/app/web`
+* All web traffic is expected to be on internal port 80. Ensure you expose this to a port of your liking.
+```bash
+docker run \
+  -e JWT_SECRET=debug-key \  # Change this!
+  -e CORS_ALLOWED_ORIGINS=\* \  # You should change this, but it's not necessary
+  -p 8080:80 \  # Change 8080 to the port you want to use to connect to webprefs
+  -v webprefs-data:/app/data \  # Ensure you create a webprefs-data volume!
+  tacticallaptopbag/webprefs
+```
+
+### Docker Compose
+
+If you use Docker Compose, download the example [docker-compose.yml](./docker-compose.yml),
+run through its config, and then run
+```bash
+docker compose up
+```
 
 
 ## API
@@ -246,3 +274,4 @@ diesel migration run
 
 <!-- links -->
 [cargo-binstall]: https://github.com/cargo-bins/cargo-binstall
+[docker-hub]: https://hub.docker.com/r/tacticallaptopbag/webprefs
