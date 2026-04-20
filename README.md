@@ -2,6 +2,38 @@
 
 This is a lightweight key-value store, intended to be used with simple applications that wish to store data online.
 
+- [webprefs](#webprefs)
+  - [API](#api)
+    - [`/login`](#login)
+      - [POST](#post)
+      - [GET](#get)
+      - [PUT](#put)
+      - [DELETE](#delete)
+    - [`/refresh`](#refresh)
+      - [POST](#post-1)
+    - [`/logout`](#logout)
+      - [POST](#post-2)
+    - [`/user`](#user)
+      - [POST](#post-3)
+    - [`/user/<id>`](#userid)
+      - [GET](#get-1)
+    - [`/prefs`](#prefs)
+      - [GET](#get-2)
+    - [`/prefs/scopes`](#prefsscopes)
+      - [GET](#get-3)
+    - [`/prefs/<scope>`](#prefsscope)
+      - [GET](#get-4)
+    - [`/prefs/<scope>/<key>`](#prefsscopekey)
+      - [GET](#get-5)
+      - [POST](#post-4)
+      - [PUT](#put-1)
+      - [DELETE](#delete-1)
+  - [Developer Setup](#developer-setup)
+    - [Dependencies](#dependencies)
+      - [Debian/Ubuntu](#debianubuntu)
+    - [Diesel](#diesel)
+
+
 ## API
 
 All routes are prefixed with `/api/v1`.
@@ -189,7 +221,8 @@ If one does not exist, this endpoint will return an error.
 ### Dependencies
 
 Requires sqlite3 to compile.
-Debian/Ubuntu:
+
+#### Debian/Ubuntu
 ```bash
 sudo apt update && sudo apt install libsqlite3-dev
 ```
