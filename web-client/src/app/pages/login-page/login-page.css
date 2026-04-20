@@ -1,0 +1,34 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-page-container {
+  min-width: 20rem;
+  background-color: lightgoldenrodyellow;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.tab-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  margin-bottom: 0.3rem;
+  border-bottom: solid;
+  border-bottom-width: 1px;
+  border-bottom-left-radius: 0.2rem;
+  border-bottom-right-radius: 0.2rem;
+  padding-left: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+.tab-row button.selected {
+  background-color: #efe;
+  color: black;
+  border-radius: 0.2rem;
+  border-color: green;
+}

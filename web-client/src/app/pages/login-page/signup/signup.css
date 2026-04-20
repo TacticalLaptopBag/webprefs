@@ -1,0 +1,22 @@
+.login-box-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.error {
+  color: red;
+}
+
+.input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-row label {
+  flex: 1;
+}
+
+.action-row {
+  justify-content: flex-end;
+}

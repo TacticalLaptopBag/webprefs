@@ -1,3 +1,4 @@
+<h1>WebPrefs Viewer</h1>
 <div class="login-page-container">
   @if(signupEnabled) {
   <div class="tab-row">
@@ -7,9 +8,11 @@
       [disabled]="currentTab() == 'signup'">Sign up</button>
   </div>
   }
-  @if(currentTab() == 'login') {
-  <app-login />
-  } @else if(currentTab() == 'signup') {
-  <app-signup />
-  }
+  <div class="tab-content">
+    @if(currentTab() == 'login') {
+    <app-login />
+    } @else if(currentTab() == 'signup') {
+    <app-signup />
+    }
+  </div>
 </div>
