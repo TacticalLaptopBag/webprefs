@@ -1,7 +1,16 @@
 <ul>
-  @for (scope of scopes$ | async; track $index) {
+  @for (scope of scopes$() | async; track $index) {
   <li>
     <a [routerLink]="`/scope/${scope}`">{{scope}}</a>
   </li>
+  } @empty {
+  <p>No scopes exist.</p>
   }
+
+  <div class="create-entry">
+    <input type="text" placeholder="Scope..." [(ngModel)]="newEntryScope">
+    <input type="text" placeholder="Key..." [(ngModel)]="newEntryKey">
+    <input type="text" placeholder="Value..." [(ngModel)]="newEntryValue">
+    <button (click)="createEntry()">Create Entry</button>
+  </div>
 </ul>

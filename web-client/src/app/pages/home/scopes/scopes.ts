@@ -1,15 +1,38 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from "@angular/router";
 import { PrefsService } from '../../../services/prefs.service';
 import { AsyncPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-scopes',
-    imports: [RouterLink, AsyncPipe],
+    imports: [RouterLink, AsyncPipe, FormsModule],
     templateUrl: './scopes.html',
     styleUrl: './scopes.css',
 })
-export class Scopes {
+export class Scopes implements OnInit {
     private _prefsSvc = inject(PrefsService)
-    public scopes$ = this._prefsSvc.getScopes()
+    public scopes$ = signal<Observable<string[]>>(of([]))
+
+    public newEntryScope = ''
+    public newEntryKey = ''
+    public newEntryValue = ''
+
+    ngOnInit(): void {
+        this.refresh()
+    }
+
+    private refresh() {
+        this.scopes$.set(this._prefsSvc.getScopes())
+    }
+
+    public createEntry() {
+        this._prefsSvc.setPref(this.newEntryScope, this.newEntryKey, this.newEntryValue).subscribe(() => {
+            this.newEntryScope = ''
+            this.newEntryKey = ''
+            this.newEntryValue = ''
+            this.refresh()
+        })
+    }
 }
