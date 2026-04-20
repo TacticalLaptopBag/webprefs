@@ -27,7 +27,10 @@ export class Signup {
         this.errorMsg.set(null)
         this._authSvc.signup(this.username(), this.password()).subscribe({
             error: (err) => {
-                const errMsg = err?.message ?? err?.error?.error ?? err?.error ?? err
+                let errMsg = err?.error?.error ?? err?.error ?? err
+                if (typeof (errMsg) !== 'string') {
+                    errMsg = err?.message
+                }
                 this.errorMsg.set(errMsg?.toString())
                 this.isLoading.set(false)
             }
