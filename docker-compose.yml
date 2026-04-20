@@ -1,6 +1,7 @@
 services:
   webprefs:
     image: tacticallaptopbag/webprefs
+    build: https://github.com/TacticalLaptopBag/webprefs.git
     environment:
       - CORS_ALLOWED_ORIGINS=*
       - JWT_SECRET=debug-key
